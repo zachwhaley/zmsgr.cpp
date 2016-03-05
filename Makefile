@@ -1,5 +1,5 @@
 CXXFLAGS = -g -Wall -Werror -std=c++14
-LDLIBS = -lzmq
+LDLIBS = -lzmq -lpthread
 
 PRGM  = libzmsgr.so
 SRCS := $(wildcard *.cpp)
@@ -17,9 +17,10 @@ $(PRGM): $(OBJS)
 	$(CXX) $(CXXFLAGS) -MMD -MP -fPIC -c $< -o $@
 
 clean:
-	rm -rf $(OBJS) $(DEPS) $(PRGM) reqrep
+	rm -rf $(OBJS) $(DEPS) $(PRGM) reqrep mtserver
 
 samples: $(PRGM)
 	$(CXX) $(CXXFLAGS) -I. -L. $(LDLIBS) -lzmsgr samples/reqrep.cpp -o reqrep
+	$(CXX) $(CXXFLAGS) -I. -L. $(LDLIBS) -lzmsgr samples/mtserver.cpp -o mtserver
 
 -include $(DEPS)
