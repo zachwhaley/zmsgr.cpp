@@ -17,10 +17,11 @@ $(PRGM): $(OBJS)
 	$(CXX) $(CXXFLAGS) -MMD -MP -fPIC -c $< -o $@
 
 clean:
-	rm -rf $(OBJS) $(DEPS) $(PRGM) reqrep mtserver
+	rm -rf $(OBJS) $(DEPS) $(PRGM) reqrep mtserver lpclient
 
 samples: $(PRGM)
 	$(CXX) $(CXXFLAGS) -I. -L. $(LDLIBS) -lzmsgr samples/reqrep.cpp -o reqrep
 	$(CXX) $(CXXFLAGS) -I. -L. $(LDLIBS) -lzmsgr samples/mtserver.cpp -o mtserver
+	$(CXX) $(CXXFLAGS) -I. -L. $(LDLIBS) -lzmsgr samples/lpclient.cpp -o lpclient
 
 -include $(DEPS)

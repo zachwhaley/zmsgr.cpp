@@ -3,6 +3,7 @@
 
 #include <zmq.hpp>
 
+#include <memory>
 #include <string>
 
 namespace zmsgr {
@@ -15,14 +16,16 @@ class ReqSocket
 public:
     void Connect(const std::string &socket);
     bool Send(const std::string &data);
-    bool Recv(std::string *data);
+    bool Resend(const std::string &data);
+    bool Recv(std::string *data, int timeout_ms = -1);
 
 ////////////////
 // Attributes //
 ////////////////
 private:
-    zmq::context_t m_context = zmq::context_t();
-    zmq::socket_t m_socket = zmq::socket_t(m_context, ZMQ_REQ);
+    zmq::context_t m_zmqctx = zmq::context_t();
+    std::unique_ptr<zmq::socket_t> m_socket = std::make_unique<zmq::socket_t>(m_zmqctx, ZMQ_REQ);
+    std::string m_request_sock;
 };
 
 } // namespace zmsgr
