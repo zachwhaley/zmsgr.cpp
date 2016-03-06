@@ -3,7 +3,6 @@
 
 #include <zmq.hpp>
 
-#include <atomic>
 #include <list>
 #include <string>
 #include <thread>
@@ -40,10 +39,9 @@ private:
     zmq::context_t m_zmqctx = zmq::context_t();
     zmq::socket_t m_router = zmq::socket_t(m_zmqctx, ZMQ_ROUTER);
     zmq::socket_t m_dealer = zmq::socket_t(m_zmqctx, ZMQ_DEALER);
-    zmq::socket_t m_control = zmq::socket_t(m_zmqctx, ZMQ_PAIR);
+    zmq::socket_t m_control = zmq::socket_t(m_zmqctx, ZMQ_SUB);
     std::string m_worker_sock;
     std::string m_control_sock;
-    std::atomic_bool m_active;
     std::thread m_server_thread;
     std::list<std::thread> m_worker_threads;
 };

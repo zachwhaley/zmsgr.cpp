@@ -13,7 +13,8 @@ Router::Bind(const string &socket, const string &inproc)
 
     m_router.bind(socket.c_str());
     m_dealer.bind(m_worker_sock.c_str());
-    m_control.bind(m_control_sock.c_str());
+    m_control.connect(m_control_sock.c_str());
+    m_control.setsockopt(ZMQ_SUBSCRIBE, "", 0);
 }
 
 void
@@ -24,12 +25,21 @@ Router::AddWorker(Worker *worker)
     thread([this, worker]() {
         zmq::socket_t socket = zmq::socket_t(m_zmqctx, ZMQ_REP);
         socket.connect(m_worker_sock.c_str());
+        zmq::socket_t control = zmq::socket_t(m_zmqctx, ZMQ_SUB);
+        control.connect(m_control_sock.c_str());
+        control.setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
-        zmq::pollitem_t item = { socket, 0, ZMQ_POLLIN, 0 };
-        while (m_active) {
+        zmq::pollitem_t items[] = {
+            { control, 0, ZMQ_POLLIN, 0 },
+            { socket, 0, ZMQ_POLLIN, 0 }
+        };
+        while (true) {
             // Poll socket for message
-            zmq::poll(&item, 1, 0);
-            if (item.revents & ZMQ_POLLIN) {
+            zmq::poll(&items[0], 2, 0);
+            if (items[0].revents & ZMQ_POLLIN) {
+                break;
+            }
+            if (items[1].revents & ZMQ_POLLIN) {
                 zmq::message_t req;
                 socket.recv(&req);
                 string data(static_cast<char *>(req.data()), req.size());
@@ -49,7 +59,6 @@ Router::AddWorker(Worker *worker)
 void
 Router::Start()
 {
-    m_active = true;
     m_server_thread = thread([this]() {
         zmq::proxy_steerable(m_router, m_dealer, nullptr, m_control);
     });
@@ -61,15 +70,14 @@ Router::Stop()
     static const string s_term = "TERMINATE";
 
     // Stop server
-    zmq::socket_t control(m_zmqctx, ZMQ_PAIR);
-    control.connect(m_control_sock.c_str());
+    zmq::socket_t control(m_zmqctx, ZMQ_PUB);
+    control.bind(m_control_sock.c_str());
     zmq::message_t term(s_term.size());
     memcpy(term.data(), s_term.data(), s_term.size());
     control.send(term);
     m_server_thread.join();
 
     // Stop workers
-    m_active = false;
     for (auto &t : m_worker_threads) {
         if (t.joinable()) {
             t.join();
