@@ -39,7 +39,7 @@ void client()
 
     string reply;
     if (req.Recv(&reply))
-        cout << "Client: Recieved: " << reply << endl;
+        cout << "Client: Recieved " << reply << endl;
     else
         cout << "Client: Recv Failed!" << endl;
 }
