@@ -1,5 +1,7 @@
 #include "server.hpp"
 
+#include "zmsgr.hpp"
+
 using namespace std;
 
 namespace zmsgr {
@@ -40,15 +42,9 @@ Router::AddWorker(Worker *worker)
                 break;
             }
             if (items[1].revents & ZMQ_POLLIN) {
-                zmq::message_t req;
-                socket.recv(&req);
-                string data(static_cast<char *>(req.data()), req.size());
-
-                string resp = worker->OnRequest(data);
-
-                zmq::message_t rep(resp.size());
-                memcpy(rep.data(), resp.data(), resp.size());
-                socket.send(rep);
+                string request;
+                RecvStr(socket, &request);
+                SendStr(socket, worker->OnRequest(request));
             }
             this_thread::yield();
         }
@@ -72,9 +68,7 @@ Router::Stop()
     // Stop server
     zmq::socket_t control(m_zmqctx, ZMQ_PUB);
     control.bind(m_control_sock.c_str());
-    zmq::message_t term(s_term.size());
-    memcpy(term.data(), s_term.data(), s_term.size());
-    control.send(term);
+    SendStr(control, s_term);
     m_server_thread.join();
 
     // Stop workers
