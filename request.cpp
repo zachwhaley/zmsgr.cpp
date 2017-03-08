@@ -33,7 +33,7 @@ ReqSocket::Send(const string &data)
 bool
 ReqSocket::Recv(string *data, int timeout_ms)
 {
-    zmq::pollitem_t item = { *m_socket, 0, ZMQ_POLLIN, 0 };
+    zmq::pollitem_t item = { static_cast<void*>(*m_socket), 0, ZMQ_POLLIN, 0 };
     zmq::poll(&item, 1, timeout_ms);
     if (item.revents & ZMQ_POLLIN) {
         return RecvStr(*m_socket, data);

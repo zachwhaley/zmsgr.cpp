@@ -2,6 +2,8 @@
 
 #include "zmsgr.hpp"
 
+#include <array>
+
 using namespace std;
 
 namespace zmsgr {
@@ -31,13 +33,13 @@ Router::AddWorker(Worker *worker)
         control.connect(m_control_sock.c_str());
         control.setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
-        zmq::pollitem_t items[] = {
-            { control, 0, ZMQ_POLLIN, 0 },
-            { socket, 0, ZMQ_POLLIN, 0 }
-        };
+        array<zmq::pollitem_t, 2> items = {{
+            { static_cast<void*>(control), 0, ZMQ_POLLIN, 0 },
+            { static_cast<void*>(socket), 0, ZMQ_POLLIN, 0 }
+        }};
         while (true) {
             // Poll socket for message
-            zmq::poll(&items[0], 2, 0);
+            zmq::poll(&items[0], items.size(), 0);
             if (items[0].revents & ZMQ_POLLIN) {
                 break;
             }
@@ -56,7 +58,7 @@ void
 Router::Start()
 {
     m_server_thread = thread([this]() {
-        zmq::proxy_steerable(m_router, m_dealer, nullptr, m_control);
+        zmq::proxy_steerable(static_cast<void*>(m_router), static_cast<void*>(m_dealer), nullptr, static_cast<void*>(m_control));
     });
 }
 
