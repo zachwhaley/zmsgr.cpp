@@ -26,7 +26,7 @@ void server()
     zmsgr::server::Router router;
     router.Bind(SOCKET, INPROC);
     for (int i = 0; i < 3; i++) {
-        router.AddWorker(new MTWorker());
+        router.AddWorker(make_shared<MTWorker>());
     }
     router.Start();
     this_thread::sleep_for(1s);

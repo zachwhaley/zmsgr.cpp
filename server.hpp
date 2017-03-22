@@ -4,6 +4,7 @@
 #include <zmq.hpp>
 
 #include <list>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -28,7 +29,7 @@ class Router
 public:
     // inproc must be a 'inproc://' socket
     void Bind(const std::string &socket, const std::string &inproc);
-    void AddWorker(Worker *worker);
+    void AddWorker(const std::shared_ptr<Worker> &worker);
     void Start();
     void Stop();
 

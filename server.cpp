@@ -22,7 +22,7 @@ Router::Bind(const string &socket, const string &inproc)
 }
 
 void
-Router::AddWorker(Worker *worker)
+Router::AddWorker(const shared_ptr<Worker> &worker)
 {
     // Start a thread for the worker
     m_worker_threads.emplace_back(
