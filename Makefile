@@ -1,4 +1,4 @@
-MAKE_CMD := $(MAKE) -C build
+MAKE_CMD := $(MAKE) -C build -s
 
 all: zmsgr
 
@@ -6,10 +6,10 @@ zmsgr: cmake
 	@$(MAKE_CMD)
 
 samples: cmake
-	@$(MAKE_CMD) samples
+	@$(MAKE_CMD) $@
 
 clean: cmake
-	@$(MAKE_CMD) clean
+	@$(MAKE_CMD) $@
 
 cmake:
 	@mkdir -p build
