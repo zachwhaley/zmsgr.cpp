@@ -1,5 +1,7 @@
 #include "reply.hpp"
 
+#include "zmsgr.hpp"
+
 using namespace std;
 
 namespace zmsgr {
@@ -13,9 +15,7 @@ RepSocket::Bind(const string &socket)
 bool
 RepSocket::Send(const string &data)
 {
-    zmq::message_t msg(data.size());
-    memcpy(msg.data(), data.data(), data.size());
-    return m_socket.send(msg);
+    return SendStr(m_socket, data);
 }
 
 bool
@@ -23,12 +23,7 @@ RepSocket::Recv(string *data)
 {
     assert(data);
 
-    zmq::message_t msg;
-    bool recieved = m_socket.recv(&msg);
-    if (recieved) {
-        data->assign(static_cast<char *>(msg.data()), msg.size());
-    }
-    return recieved;
+    return RecvStr(m_socket, data);
 }
 
 } // namespace zmsgr
