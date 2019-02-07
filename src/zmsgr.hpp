@@ -7,16 +7,16 @@
 
 namespace zmsgr {
 
-static bool
-SendStr(zmq::socket_t &socket, const std::string &data)
+inline bool
+SendStr(zmq::socket_t& socket, const std::string& data)
 {
-    zmq::message_t msg(data.size());
+    zmq::message_t msg {data.size()};
     memcpy(msg.data(), data.data(), data.size());
     return socket.send(msg);
 }
 
-static bool
-RecvStr(zmq::socket_t &socket, std::string *data)
+inline bool
+RecvStr(zmq::socket_t& socket, std::string* data)
 {
     zmq::message_t msg;
     bool recieved = socket.recv(&msg);

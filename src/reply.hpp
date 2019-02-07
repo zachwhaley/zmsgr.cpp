@@ -13,16 +13,16 @@ class RepSocket
 // Functions //
 ///////////////
 public:
-    void Bind(const std::string &socket);
-    bool Send(const std::string &data);
-    bool Recv(std::string *data);
+    void Bind(const std::string& socket);
+    bool Send(const std::string& data);
+    bool Recv(std::string* data);
 
 ////////////////
 // Attributes //
 ////////////////
 private:
-    zmq::context_t m_zmqctx = zmq::context_t();
-    zmq::socket_t m_socket = zmq::socket_t(m_zmqctx, ZMQ_REP);
+    zmq::context_t _zmqctx {zmq::context_t()};
+    zmq::socket_t _socket {zmq::socket_t(_zmqctx, ZMQ_REP)};
 
 };
 

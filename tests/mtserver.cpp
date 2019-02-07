@@ -10,23 +10,14 @@ using namespace std;
 static const string SOCKET = "ipc://mtserver.ipc";
 static const string INPROC = "inproc://mtserver";
 
-class MTWorker : public zmsgr::server::Worker
-{
-public:
-    MTWorker() {}
-    virtual ~MTWorker() {}
-    virtual string OnRequest(const string &data)
-    {
-        return string(data + " Done!");
-    }
-};
-
 void server()
 {
     zmsgr::server::Router router;
     router.Bind(SOCKET, INPROC);
     for (int i = 0; i < 3; i++) {
-        router.AddWorker(make_shared<MTWorker>());
+        router.AddWorker([](const string& data) {
+            return string(data + " Done!");
+        });
     }
     router.Start();
     this_thread::sleep_for(1s);

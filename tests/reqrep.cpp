@@ -19,7 +19,7 @@ void server()
     else
         cout << "Server: Recv Failed!" << endl;
 
-    string goodbye = "Goodbye!";
+    string goodbye {"Goodbye!"};
     if (rep.Send(goodbye))
         cout << "Server: Sent " << goodbye << endl;
     else
@@ -31,7 +31,7 @@ void client()
     zmsgr::ReqSocket req;
     req.Connect(SOCKET);
 
-    string hello = "Hello!";
+    string hello {"Hello!"};
     if (req.Send(hello))
         cout << "Client: Sent " << hello << endl;
     else
@@ -46,9 +46,9 @@ void client()
 
 int main(int argc, const char *argv[])
 {
-    thread s(server);
+    thread s {server};
     this_thread::sleep_for(1ms);
-    thread c(client);
+    thread c {client};
 
     s.join();
     c.join();
